@@ -1,0 +1,148 @@
+<html><style>
+#mid	{font: 14 verdana}
+
+.key		{font: 11px "Lucida Sans Unicode";
+		border:2px #888 solid; border-top:1px #aaa solid;
+		border-bottom:6px #666 solid; letter-spacing:-1px;
+		vertical-align:middle;text-shadow: #ccc 0px 0px 2px;}
+
+hr		{border:none;border-bottom:1px #000 dashed;height:1px;color:#fff;}
+
+.normal		{font: 11px "Lucida Sans Unicode";}
+
+#word		{font-size: 18px;text-shadow: #ccc 0px 0px 2px;}
+#def		{font-size: 13px; text-align:left}
+.syn		{color:#aaa}
+.defblock	{margin-left:5px}
+
+#repeated	{color:#fff;font-size:2px;}
+		
+</style><script src=wordlist.js></script><script src=defs.js></script><script>
+/*******************************************************************************
+********************************************************************************
+********************************************************************************
+
+		GRE vocabulary flashcard set
+		JSYang	~ http://jsyang.ca
+		dd/mm/yyyy
+		04/05/2010 07:12
+
+
+********************************************************************************
+********************************************************************************
+*******************************************************************************/
+
+function o(a){return document.getElementById(a);};
+
+var flashcards={
+	
+	currentIndex:0,
+	
+	history:[],
+	size:0,
+	
+	
+	search:function(){
+		var a=prompt("Word to search for","");
+		var b=words.indexOf(a);
+		if(b<0) return alert("\""+a+"\" couldn't be found!");
+		this.showAll(b);
+	},
+	
+	showHistory:function(){
+		o('word').innerHTML="Flashcard Session History";
+		var hist="<ol>";
+		for(var i in this.history){
+			var a=this.history[i];
+			hist+="<li><a href='javascript:flashcards.showAll("+a+")'>"+words[a]+"</a></li>";
+		}
+		o('def').innerHTML=hist+"</ol>";
+	},
+	
+	formatDef:function(def){
+		var a="<div id=repeated>"+def;
+
+		var i=0;
+		while (++i<20){
+			var b=new RegExp("("+i+")(:)","g");
+			a=a.replace(b,"</div><br><div>"+i+":");
+		}
+		
+		a=a.replace(" n ","</div><br><br><b>noun</b> <div>");
+		a=a.replace(" adj ","</div><br><br><b>adjective</b> <div>");
+		a=a.replace(" adv ","</div><br><br><b>adverb</b> <div>");
+		a=a.replace(" v ","</div><br><br><b>verb</b> <div>");
+
+
+		a=a.replace(/;/g,";<br>");
+		var b=new RegExp("(\\[)","g");
+		a=a.replace(b,"<br><span class=syn>[");
+		var b=new RegExp("(\\])","g");
+		a=a.replace(b,"]</span>");
+		var b=new RegExp("(\\()","g");
+		a=a.replace(b,"(<i>");
+		var b=new RegExp("(\\))","g");
+		a=a.replace(b,"</i>)");
+
+		return a;
+	},
+	
+	randomWord:function(){
+		this.currentIndex=(this.size*Math.random())>>0;
+		this.history.push(this.currentIndex);
+		this.showWord();
+		o('def').innerHTML="";
+	},
+
+	showAll:function(i){this.currentIndex=i;this.showWord();this.showDef();},
+	
+	showWord:function(){o('word').innerHTML=words[this.currentIndex];},	
+	showDef:function(){o('def').innerHTML=this.formatDef(defs[this.currentIndex]);},
+		
+	init:function(){
+		this.size=words.length;
+		window.onkeyup=function(e){
+			//document.title=e.which;
+			switch(e.which){
+				case 32: flashcards.randomWord(); break;
+				case 17: flashcards.search(); break;
+				case 77: flashcards.showDef(); break;
+				case 72: flashcards.showHistory(); break;
+			}
+		}
+		this.randomWord();
+	}
+};
+
+</script><title>GRE Vocab Flashcards</title><body onload="flashcards.init()"><table width=100% height=100%>
+<tr><td colspan=3 height=1%></td></tr>
+<tr><td width=1% height=98%></td><td width=98% height=98% valign=middle align=center id=mid>
+<b id=word></b><hr>
+<div id=def></div><br><br>
+<hr>
+
+<table cellspacing=8><tr>
+<td class=normal align=center>Search<br><input type=button value=Ctrl class=key></td>
+<td class=normal align=center>Random word<br><input type=button value="                                                        " class=key></td>
+<td class=normal align=center>Define<br><input type=button value=M class=key></td>
+<td class=normal align=center>History<br><input type=button value=H class=key></td>
+</tr></table>
+
+</td><td width=1% height=98%></td></tr>
+<tr><td height=1% colspan=3></td></tr>
+</table>
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=5838924; 
+var sc_invisible=1; 
+var sc_security="eb2b5a13"; 
+</script>
+
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter.js"></script><noscript><div
+class="statcounter"><a title="godaddy web stats"
+href="http://www.statcounter.com/godaddy_website_tonight/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/5838924/0/eb2b5a13/1/"
+alt="godaddy web stats" ></a></div></noscript>
+<!-- End of StatCounter Code --></body></html>

@@ -1,0 +1,71 @@
+<html><title>jsyang.ca</title>
+<link rel="stylesheet" href="/css/custom.css"/>
+<link rel="stylesheet" href="/css/index.css"/>
+<body>
+<h1 id="web-based-flash-cards-app">Web-based Flash Cards app</h1>
+<h2 id="01-06-2010">01/06/2010</h2>
+<h3 id="gre-english-vocabulary-flash-cards">GRE English Vocabulary flash cards</h3>
+<p>As it turns out, a friend of mine is beginning to study for the GRE to apply for grad school
+in about a year or so. One part of the test involves advanced English vocabulary. One night,
+knowing very well how I can never resist doing something new, he sent me a list of words to
+help process. Eventually, the conversation led me to ask him what he truly wanted done after
+all these words were compiled. Basically, it was a flashcard app that he could use to help
+familiarize himself with the definitions of various esoteric words.</p>
+<p>The task appeared simple but as with most new things, you don&#39;t really know how to appreciate
+the details until they hit you face-first later on. To start, he sent me several lists of all
+the words that he needed to study for. These were from some kind of audio tape transcription,
+as they had times attached to them. After initial merging, filtering and sorting in Excel, I
+ended up with a master list of about 7500 words total.</p>
+<p><img src="grewords1.png" alt="1">
+<em>merge word lists into a single master list</em></p>
+<h3 id="finding-the-definitions">Finding the Definitions</h3>
+<p>After all these words were compiled, the next thing I needed was a full set of definitions
+for every one of the words in this list. I&#39;ve never had to do anything quite like programmatically
+define 7500 words. But I did know that there were &quot;reference API&quot;s. However, after much searching,
+none of them really gave me what I was looking for without either having to wait for an API access
+key (the thing that allows the service to track how you use their data) or even worse, spend extra
+time to further translate between formats (especially XML -- this is the worst!).</p>
+<p>Luckily, I stumbled across the dict.org repository of English reference data, which included the
+&quot;WordNet 2.0&quot; data set. That particular set had minimal formatting, the definitions were concise
+and included other stuff packed in like synonyms and antonyms; it was as perfect as I was going
+to get.</p>
+<h3 id="extracting-the-definitions">Extracting the Definitions</h3>
+<p>The definition page that this online dictionary spat out was ideal in terms of repurposing. All the
+definitions were just raw text (with some links) enclosed in <code>&lt;pre&gt;</code> tags which I could easily
+identify and pick out using some of my previously written Snaggletooth tools. A separate script
+was used to automatically download all the definition pages for the undefined words in my master list.
+I let it loose for about an hour gathering up roughly 6MB of definition text. This is the defineAll script that I
+wrote to amass the 7500 definitions:</p>
+<pre><code>@echo off
+for /f %%i in (wordlist.txt) do (
+echo Defining %%i...
+curl -s --data &quot;Form=Dict1&quot; --data &quot;Strategy=*&quot; --data &quot;Query=%%i&quot; --data &quot;Database=wn&quot; --data &quot;submit=Submit query&quot; &quot;http://www.dict.org/bin/Dict&quot; &gt;def.txt
+echo $-- &gt;&gt; defAll.txt
+tf filters\find_def.txt def.txt &gt;&gt; defAll.txt
+echo $++ &gt;&gt; defAll.txt
+)
+</code></pre><p>I used some special strings in between the entries to separate them so I could do some REPLACE-ALLs
+to sanitize the quotes and do other things to the definition text. My SnaggleTooth tools for
+text-processing were also used to clean the raw text into something more useful.</p>
+<p>A special thing to note is that there are plenty of tools out there for pretty much any processing
+job you&#39;d ever want done, if you were lazy enough to look for them. I was tempted to roll my own, but
+luckily I used NirSoft&#39;s HTML detagger tool instead to rip out the links in the definition for the
+synonyms; they didn&#39;t have meaning anymore after being compiled. That saved a lot of time.</p>
+<p>After all the definitions were thoroughly processed and saved as an external Javascript database,
+I coded up the flashcard app to be as simple to use and clear as possible. Sadly, my friend had gone
+to bed by then but I just assumed the typical use-cases to come up with some basic features which
+anyone using a type of flashcard program would want to have: search, random card, history, groups of
+words by reference. Those ended up matching his intended needs.</p>
+<p>Note: this app does not run in any version of IE, (until IE9, proportedly). It was new and fun for
+me to crawl the word data for the app. And hopefully, it&#39;ll also have solved his problem of studying
+for that part of the GRE. Good luck buddy!</p>
+<h3 id="the-app">The App</h3>
+<p>The <a href="flashcards.html">flashcards</a> app.</p>
+<iframe src="./flashcards.html" height="500"></iframe>
+
+<p><a href="flashcards.rar">Source in a RAR archive.</a></p>
+
+<script src="/js/tracking.js"></script>
+<script src="/js/index.js"></script>
+</body>
+</html>
